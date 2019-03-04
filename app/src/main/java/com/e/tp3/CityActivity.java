@@ -1,20 +1,14 @@
 package com.e.tp3;
 
 import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 
 public class CityActivity extends AppCompatActivity {
@@ -41,6 +35,19 @@ public class CityActivity extends AppCompatActivity {
 
         imageWeatherCondition = (ImageView) findViewById(R.id.imageView);
 
+        final City city = (City) getIntent().getParcelableExtra("CITY");
+        Long cityId = null;
+        if(city != null){
+            textCityName.setText(city.getName());
+            textCountry.setText(city.getCountry());
+            textTemperature.setText(city.getTemperature());
+            textHumdity.setText(city.getHumidity());
+            textWind.setText(city.getWindSpeed());
+            textCloudiness.setText(city.getCloudiness());
+            textLastUpdate.setText(city.getLastUpdate());
+        }
+
+
         updateView();
 
         final Button mettreAJour = (Button) findViewById(R.id.button);
@@ -54,6 +61,8 @@ public class CityActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+
 
     }
 
