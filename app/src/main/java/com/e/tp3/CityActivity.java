@@ -1,6 +1,8 @@
 package com.e.tp3;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -9,6 +11,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 
 public class CityActivity extends AppCompatActivity {
@@ -35,7 +42,7 @@ public class CityActivity extends AppCompatActivity {
 
         imageWeatherCondition = (ImageView) findViewById(R.id.imageView);
 
-        final City city = (City) getIntent().getParcelableExtra("CITY");
+        final City city = (City) getIntent().getParcelableExtra("City");
         Long cityId = null;
         if(city != null){
             textCityName.setText(city.getName());
@@ -57,8 +64,30 @@ public class CityActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent mainActivity = new Intent(getBaseContext(), MainActivity.class);
-                startActivity(mainActivity);
-                finish();
+                class AsyncHttpWeather extends AsyncTask{
+
+                    @SuppressLint("WrongThread")
+                    @Override
+                    protected Object doInBackground(Object[] objects) {
+                        try {
+                            Log.i("********test", "test");
+                            URL url = WebServiceUrl.build(city.getName(), city.getCountry());
+                            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                            InputStream inputStream = httpURLConnection.getInputStream();
+                            JSONResponseHandler jsonResponseHandler = new JSONResponseHandler(city);
+                            jsonResponseHandler.readJsonStream(inputStream);
+
+
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+                }
+                new AsyncHttpWeather().execute("");
+                //finish();
             }
         });
 

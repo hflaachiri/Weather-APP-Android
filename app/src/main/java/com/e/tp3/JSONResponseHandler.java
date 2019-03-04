@@ -13,9 +13,6 @@ import java.util.Date;
  * Process the response to a GET request to the Web service
  * api.openweathermap.org
  * Responses must be provided in JSON.
- *
- *
- *
  */
 
 
@@ -50,15 +47,17 @@ public class JSONResponseHandler {
             String name = reader.nextName();
             if (name.equals("weather")) {
                 readWeather(reader);
-            } else if (name.equals("main")) {
-                readMain(reader);
-            } else if (name.equals("wind")) {
-                readWind(reader);
-            } else if (name.equals("clouds")) {
-                readClouds(reader);
-            } else if (name.equals("dt")) {
-                city.setLastUpdate(unixTime2date(reader.nextLong()));
-            } else {
+            }
+//            else if (name.equals("main")) {
+//                readMain(reader);
+//            } else if (name.equals("wind")) {
+//                readWind(reader);
+//            } else if (name.equals("clouds")) {
+//                readClouds(reader);
+//            } else if (name.equals("dt")) {
+//                city.setLastUpdate(unixTime2date(reader.nextLong()));
+//            }
+            else {
                 reader.skipValue();
             }
         }
@@ -69,8 +68,31 @@ public class JSONResponseHandler {
     private void readWeather(JsonReader reader) throws IOException {
         reader.beginArray();
         int nb = 0; // only consider the first element of the array
-        while (reader.hasNext() && nb==0) {
-            // TODO: complete
+        while (reader.hasNext() && nb == 0) {
+            reader.beginObject();
+            long id;
+            String main;
+            String desc = null;
+            String icon;
+            while (reader.hasNext()) {
+                String name = reader.nextName();
+                switch (name) {
+                    case "id":
+                        id = reader.nextLong();
+                        break;
+                    case "main":
+                        main = reader.nextString();
+                        break;
+                    case "description":
+                        desc = reader.nextString();
+                        break;
+                    case "icon":
+                        icon = reader.nextString();
+                        break;
+                }
+            }
+            reader.endObject();
+            Log.i("***********desc", desc);
             nb++;
         }
         reader.endArray();
@@ -85,7 +107,7 @@ public class JSONResponseHandler {
             } else if (name.equals("humidity")) {
                 // TODO: complete
             } else {
-               reader.skipValue();
+                reader.skipValue();
             }
         }
         reader.endObject();
@@ -113,26 +135,26 @@ public class JSONResponseHandler {
     }
 
     private String unixTime2date(long time) {
-        Date date = new Date(time*1000);
+        Date date = new Date(time * 1000);
         return date.toString();
     }
 
     private String kelvin2celsius(double t) {
-        Log.d(TAG, "read temperature="+t);
-        return String.valueOf((int)(t-273.15));
+        Log.d(TAG, "read temperature=" + t);
+        return String.valueOf((int) (t - 273.15));
     }
 
     private String farenheit2celsius(double t) {
-        return String.valueOf((int) ((5.0/9.0) * (t-32)));
+        return String.valueOf((int) ((5.0 / 9.0) * (t - 32)));
     }
 
     private String mph2kmh(double speed) {
-        return String.valueOf((int) (speed*1.609344));
+        return String.valueOf((int) (speed * 1.609344));
     }
 
     private String deg2compass(int deg) {
-        String[] arrComp = {"N","NNE","NE","ENE","E","ESE", "SE", "SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"};
-        int val = (int)((((float)deg)/22.5)+.5);
+        String[] arrComp = {"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"};
+        int val = (int) ((((float) deg) / 22.5) + .5);
         return arrComp[val % 16];
     }
 }
